@@ -453,12 +453,6 @@ class SQLDiff(object):
         return {}
 
     def find_differences(self):
-        if self.options['all_applications']:
-            self.add_app_model_marker(None, None)
-            for table in self.db_tables:
-                if table not in self.django_tables and table not in self.IGNORE_MISSING_TABLES:
-                    self.add_difference('table-missing-in-model', table)
-
         cur_app_label = None
         for app_model in self.app_models:
             meta = app_model._meta
@@ -529,6 +523,12 @@ class SQLDiff(object):
             # 9) find: 'field-notnull'
             self.find_field_notnull_differ(meta, table_description, table_name)
         self.has_differences = max([len(diffs) for _app_label, _model_name, diffs in self.differences])
+
+        if self.options['all_applications']:
+            self.add_app_model_marker(None, None)
+            for table in self.db_tables:
+                if table not in self.django_tables and table not in self.IGNORE_MISSING_TABLES:
+                    self.add_difference('table-missing-in-model', table)
 
     def print_diff(self, style=no_style()):
         """ print differences to stdout """
