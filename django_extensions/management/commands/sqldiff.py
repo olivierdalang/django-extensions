@@ -579,6 +579,7 @@ class SQLDiff(object):
                 print(style.SQL_KEYWORD("-- No differences"))
         else:
             print(style.SQL_KEYWORD("BEGIN;"))
+            print(style.SQL_KEYWORD("SET CONSTRAINTS DEFERRED;"))
             for app_label, model_name, diffs in self.differences:
                 if not diffs:
                     continue
