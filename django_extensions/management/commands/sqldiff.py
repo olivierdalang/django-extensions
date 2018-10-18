@@ -125,8 +125,11 @@ class SQLDiff(object):
     SQL_ERROR = lambda self, style, qn, args: style.NOTICE('-- Error: %s' % style.ERROR(args[0]))
     SQL_COMMENT = lambda self, style, qn, args: style.NOTICE('-- Comment: %s' % style.SQL_TABLE(args[0]))
     SQL_TABLE_MISSING_IN_DB = lambda self, style, qn, args: style.NOTICE('-- Table missing: %s' % args[0])
-    SQL_TABLE_MISSING_IN_MODEL = lambda self, style, qn, args: "%s\n%s%s %s;" % (style.NOTICE('-- Model missing for table: %s' % args[0]), '' if self.options["drop"] else '--', style.SQL_KEYWORD('DROP TABLE'), style.SQL_TABLE(qn(args[0])))
-
+    if self.options["drop"]:
+        SQL_TABLE_MISSING_IN_MODEL = lambda self, style, qn, args: "%s\n%s %s;" % (style.NOTICE('-- Model missing for table: %s' % args[0]), style.SQL_KEYWORD('DROP TABLE'), style.SQL_TABLE(qn(args[0])))
+    else:
+        SQL_TABLE_MISSING_IN_MODEL = lambda self, style, qn, args: "%s\n-- %s %s;" % (style.NOTICE('-- Model missing for table: %s' % args[0]), style.NOTICE('DROP TABLE'), style.NOTICE(qn(args[0])))
+    
     can_detect_notnull_differ = False
     can_detect_unsigned_differ = False
     unsigned_suffix = None  # type: Optional[str]
