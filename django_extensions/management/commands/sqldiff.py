@@ -125,7 +125,7 @@ class SQLDiff(object):
     SQL_ERROR = lambda self, style, qn, args: style.NOTICE('-- Error: %s' % style.ERROR(args[0]))
     SQL_COMMENT = lambda self, style, qn, args: style.NOTICE('-- Comment: %s' % style.SQL_TABLE(args[0]))
     SQL_TABLE_MISSING_IN_DB = lambda self, style, qn, args: style.NOTICE('-- Table missing: %s' % args[0])
-    SQL_TABLE_MISSING_IN_MODEL = lambda self, style, qn, args: style.NOTICE('-- Model missing for table: %s' % args[0])
+    SQL_TABLE_MISSING_IN_MODEL = lambda self, style, qn, args: "%s\n%s%s %s;" % (style.NOTICE('-- Model missing for table: %s' % args[0]), '' if self.options["drop"] else '--', style.SQL_KEYWORD('DROP TABLE'), style.SQL_TABLE(qn(args[0])))
 
     can_detect_notnull_differ = False
     can_detect_unsigned_differ = False
@@ -1015,6 +1015,11 @@ to check/debug ur models compared to the real database tables and columns."""
             '--dense-output', '-d', action='store_true', dest='dense_output',
             default=False,
             help="Shows the output in dense format, normally output is spreaded over multiple lines."
+        )
+        parser.add_argument(
+            '--drop', '-D', action='store_true', dest='drop',
+            default=False,
+            help="Drop tables that have no existing model."
         )
         parser.add_argument(
             '--output_text', '-t', action='store_false', dest='sql',
